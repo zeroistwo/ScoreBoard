@@ -10,11 +10,13 @@ results_url = "https://www.scoreboard.com/kr/soccer/"
 # 기타 변수
 NATION = "Input nation name: "
 LEAGUE = "Input league name: "
-DATAFRAME = ['Round', 'Date', 'Time', 'Home_Team', 'Home_Score', 'Away_Score', 'Away_Team']
+RESULTSDATAFRAME = ['Round', 'Date', 'Time', 'Home_Team', 'Home_Score', 'Away_Score', 'Away_Team']
+STANDINGSDATAFRAME = ['Position', 'Team', 'Played', 'Won', 'Drawn', 'Loss', 'Goals_For', 'Goals_Against', 'Points']
 FILEROUTE = '/Users/admin/chromedriver'
 results_more = '#tournament-page-results-more > tbody > tr > td > a'
 year = '2018'
-filename = 'ScoreBoard'
+result_filename = 'ScoreBoard'
+standing_filename = 'Position'
 
 def crawlResults(nation_name, league_name):
     driver = webdriver.Chrome(FILEROUTE)
@@ -46,20 +48,56 @@ def crawlResults(nation_name, league_name):
             day = daytime.get_text().split('. ')[0].split('.')[0]
             hour = daytime.get_text().split('. ')[1].split(':')[0]
             minute = daytime.get_text().split('. ')[1].split(':')[1]
-            raw_data.append(round_list)
-            raw_data.append(datetime.date(int(year), int(month), int(day)))
-            raw_data.append(datetime.time(int(hour), int(minute)))
-            raw_data.append(home_team.span.get_text().split('\xa0')[0])
-            raw_data.append(home_score)
-            raw_data.append(away_score)
-            raw_data.append(away_team.span.get_text().split('\xa0')[0])
+            raw_data.append(round_list)                                         # 1. Round
+            raw_data.append(datetime.date(int(year), int(month), int(day)))     # 2. Date
+            raw_data.append(datetime.time(int(hour), int(minute)))              # 3. Time
+            raw_data.append(home_team.span.get_text().split('\xa0')[0])         # 4. Home_Team
+            raw_data.append(home_score)                                         # 5. Home_Score
+            raw_data.append(away_score)                                         # 6. Away_Score
+            raw_data.append(away_team.span.get_text().split('\xa0')[0])         # 7. Away_Team
             game_list.append(raw_data)
         else:
             pass
     driver.close()
     return game_list
 
-def saveAsCsv(game_list, league_name):
+def crawlStandings(nation_name, league_name):
+    driver = webdriver.Chrome(FILEROUTE)
+    url = results_url + nation_name + '/' + league_name + '/standings/'
+    driver.get(url)
+    page = driver.page_source
+    rank_soup = bs(page, 'html.parser')
+    tr_list = rank_soup.find('table', id='table-type-1').find('tbody').findAll('tr')
+    rank_list = []
+    for tr_index in range(len(tr_list)):
+        raw_data = []
+        get_class = tr_list[tr_index].get('class')[0]
+        if get_class == 'even' or 'odd':
+            rank = tr_list[tr_index].find('td', class_='rank').get_text().split('.')[0]
+            team_name = tr_list[tr_index].find('span', class_='team_name_span').get_text()
+            played = tr_list[tr_index].find('td', class_='matches_played').get_text()
+            won = tr_list[tr_index].find('td', class_='wins_regular').get_text()
+            drawn = tr_list[tr_index].find('td', class_='draws').get_text()
+            loss = tr_list[tr_index].find('td', class_='losses_regular').get_text()
+            goals_for = tr_list[tr_index].findAll('td', class_='goals')[0].get_text().split(':')[0]
+            goals_against = tr_list[tr_index].findAll('td', class_='goals')[0].get_text().split(':')[1]
+            points = tr_list[tr_index].findAll('td', class_='goals')[1].get_text()
+            raw_data.append(rank)
+            raw_data.append(team_name)
+            raw_data.append(played)
+            raw_data.append(won)
+            raw_data.append(drawn)
+            raw_data.append(loss)
+            raw_data.append(goals_for)
+            raw_data.append(goals_against)
+            raw_data.append(points)
+            rank_list.append(raw_data)
+        else:
+            pass
+    driver.close()
+    return rank_list
+
+def saveAsCsv(game_list, league_name, filename, DATAFRAME):
     with open('{}_{}.csv'.format(filename, league_name), "w") as output:  # 크롤링한 결과물들을 csv파일의 형태로 저장
         writer = csv.writer(output, lineterminator='\n')
         writer.writerow(DATAFRAME)
@@ -75,4 +113,6 @@ if __name__ == "__main__":
         nation_name = input(NATION)
         league_name = input(LEAGUE)
         game_list = crawlResults(nation_name, league_name)
-        saveAsCsv(game_list, league_name)
+        position_list = crawlStandings(nation_name, league_name)
+        saveAsCsv(game_list, league_name, result_filename, RESULTSDATAFRAME)
+        saveAsCsv(position_list, league_name, standing_filename, STANDINGSDATAFRAME)
