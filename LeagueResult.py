@@ -16,14 +16,15 @@ results_more = '#tournament-page-results-more > tbody > tr > td > a'
 year = '2018'
 filename = 'ScoreBoard'
 
-def crawlScoreBoard(nation_name, league_name):
+def crawlResults(nation_name, league_name):
     driver = webdriver.Chrome(FILEROUTE)
     url = results_url + nation_name + '/' + league_name + '/results/'
     driver.get(url)
     try:
         while True:
+            # 전체 경기 결과 가져오기 위해 '더 많은 경기 보기' href 클릭
             driver.find_element_by_css_selector(results_more).click()
-            time.sleep(10)
+            time.sleep(10) # loading하는 시간 필요
     except Exception as e:
         print(e)
     page = driver.page_source
@@ -73,5 +74,5 @@ if __name__ == "__main__":
     while True:
         nation_name = input(NATION)
         league_name = input(LEAGUE)
-        game_list = crawlScoreBoard(nation_name, league_name)
+        game_list = crawlResults(nation_name, league_name)
         saveAsCsv(game_list, league_name)
