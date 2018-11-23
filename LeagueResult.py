@@ -113,6 +113,6 @@ if __name__ == "__main__":
         nation_name = input(NATION)
         league_name = input(LEAGUE)
         game_list = crawlResults(nation_name, league_name)
-        position_list = crawlStandings(nation_name, league_name)
+        rank_list = crawlStandings(nation_name, league_name)
         saveAsCsv(game_list, league_name, result_filename, RESULTSDATAFRAME)
-        saveAsCsv(position_list, league_name, standing_filename, STANDINGSDATAFRAME)
+        saveAsCsv(rank_list, league_name, standing_filename, STANDINGSDATAFRAME)
