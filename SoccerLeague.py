@@ -9,8 +9,6 @@ results_url = "https://www.scoreboard.com/kr/soccer/{nation}/{league}/results"
 stnading_url = "https://www.scoreboard.com/kr/soccer/{nation}/{league}/standings"
 
 # 기타 변수
-NATION = "Input nation name: "
-LEAGUE = "Input league name: "
 RESULTSDATAFRAME = ['Round', 'Date', 'Time', 'Home_Team', 'Home_Score', 'Away_Score', 'Away_Team']
 STANDINGSDATAFRAME = ['Position', 'Team', 'Played', 'Won', 'Drawn', 'Loss', 'Goals_For', 'Goals_Against', 'Points']
 FILEROUTE = '/Users/admin/chromedriver'
@@ -21,7 +19,7 @@ standing_filename = 'Position'
 
 def crawlResults(nation_name, league_name):
     driver = webdriver.Chrome(FILEROUTE)
-    url = results_url.format(nation = nation_name, league = league_name)
+    url = results_url.format(nation=nation_name, league=league_name)
     driver.get(url)
     try:
         while True:
@@ -68,8 +66,9 @@ def crawlResults(nation_name, league_name):
 def crawlStandings(nation_name, league_name):
     try:
         driver = webdriver.Chrome(FILEROUTE)
-        url = results_url.format(nation = nation_name, league = league_name)
+        url = stnading_url.format(nation=nation_name, league=league_name)
         driver.get(url)
+        time.sleep(10)  # loading하는 시간 필요
         page = driver.page_source
         rank_soup = bs(page, 'html.parser')
         tr_list = rank_soup.find('table', id='table-type-1').find('tbody').findAll('tr')
@@ -126,6 +125,6 @@ if __name__ == "__main__":
 
             print(nation_name, league_name)
             game_list = crawlResults(nation_name, league_name)
-            rank_list = crawlStandings(nation_name, league_name)
             saveAsCsv(game_list, league_name, result_filename, RESULTSDATAFRAME)
+            rank_list = crawlStandings(nation_name, league_name)
             saveAsCsv(rank_list, league_name, standing_filename, STANDINGSDATAFRAME)
