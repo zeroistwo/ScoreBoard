@@ -115,16 +115,15 @@ def saveAsCsv(list, league_name, filename, DATAFRAME):
                 print(e)
 
 if __name__ == "__main__":
-    while True:
-        nation_name_list = ('england', 'spain', 'germany', 'italy')
-        league_name_list = ('premier-league', 'laliga', 'bundesliga', 'serie-a')
+    nation_name_list = ('england', 'spain', 'germany', 'italy')
+    league_name_list = ('premier-league', 'laliga', 'bundesliga', 'serie-a')
 
-        for i in range(0, 4):
-            nation_name = nation_name_list[i]
-            league_name = league_name_list[i]
+    for i in range(4):
+        nation_name = nation_name_list[i]
+        league_name = league_name_list[i]
 
-            print(nation_name, league_name)
-            game_list = crawlResults(nation_name, league_name)
-            saveAsCsv(game_list, league_name, result_filename, RESULTSDATAFRAME)
-            rank_list = crawlStandings(nation_name, league_name)
-            saveAsCsv(rank_list, league_name, standing_filename, STANDINGSDATAFRAME)
+        print(nation_name, league_name)
+        game_list = crawlResults(nation_name, league_name)
+        saveAsCsv(game_list, league_name, result_filename, RESULTSDATAFRAME)
+        rank_list = crawlStandings(nation_name, league_name)
+        saveAsCsv(rank_list, league_name, standing_filename, STANDINGSDATAFRAME)
