@@ -65,7 +65,15 @@ def crawlResults(nation_name, league_name):
 
 def crawlStandings(nation_name, league_name):
     try:
-        driver = webdriver.Chrome(FILEROUTE)
+
+        # 서버 실행 시 필요
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        browser = webdriver.Chrome(chrome_options=chrome_options)
+
+        driver = webdriver.Chrome()
         url = stnading_url.format(nation=nation_name, league=league_name)
         driver.get(url)
         time.sleep(10)  # loading하는 시간 필요
